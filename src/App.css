@@ -17,17 +17,12 @@
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 button { background: none; border: none; cursor: pointer; font-family: inherit; }
-html, body, #root {
-  height: 100%;
-  height: -webkit-fill-available;
-  overflow: hidden;
-  font-family: var(--font-main);
-  background: white;
-}
+body { font-family: var(--font-main); background: white; }
 
 /* ── App Layout ── */
 .app-root {
-  height: 100%;
+  position: fixed;
+  inset: 0;
   background: var(--uq-white);
 }
 
@@ -37,7 +32,6 @@ html, body, #root {
   background: var(--uq-white);
   display: flex;
   flex-direction: column;
-  position: relative;
   overflow: hidden;
 }
 
