@@ -17,18 +17,23 @@
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 button { background: none; border: none; cursor: pointer; font-family: inherit; }
-body { font-family: var(--font-main); background: #e8e8e8; }
+html, body, #root {
+  height: 100%;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  font-family: var(--font-main);
+  background: white;
+}
 
 /* ── App Layout ── */
 .app-root {
-  min-height: 100vh;
+  height: 100%;
   background: var(--uq-white);
 }
 
 .phone-frame {
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   background: var(--uq-white);
   display: flex;
   flex-direction: column;
