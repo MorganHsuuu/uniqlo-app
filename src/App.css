@@ -28,6 +28,7 @@ body { font-family: var(--font-main); background: #e8e8e8; }
 .phone-frame {
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   background: var(--uq-white);
   display: flex;
   flex-direction: column;
@@ -47,8 +48,7 @@ body { font-family: var(--font-main); background: #e8e8e8; }
   padding: 10px 24px 10px;
   border-bottom: var(--uq-border);
   background: var(--uq-white);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 100;
 }
 
@@ -89,8 +89,7 @@ body { font-family: var(--font-main); background: #e8e8e8; }
   display: flex;
   border-bottom: var(--uq-border);
   background: var(--uq-white);
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 50;
 }
 .nav-item {
@@ -125,8 +124,6 @@ body { font-family: var(--font-main); background: #e8e8e8; }
   background: var(--uq-white);
   padding: 10px 0 env(safe-area-inset-bottom, 16px);
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
   z-index: 100;
 }
 .tab-item {
