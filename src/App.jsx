@@ -33,7 +33,7 @@ const restore = (key, fallback) => { try { return sessionStorage.getItem(key) ||
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(() => restore("uq_tab", "home"));
-  const [activeNav, setActiveNav] = useState(() => restore("uq_nav", "KIDS"));
+  const [activeNav, setActiveNav] = useState(() => restore("uq_nav", "WOMEN"));
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState(null);
   const [cart, setCart] = useState([]);
