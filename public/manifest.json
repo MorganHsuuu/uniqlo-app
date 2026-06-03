@@ -1,0 +1,15 @@
+{
+  "name": "UNIQLO",
+  "short_name": "UNIQLO",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#e40012",
+  "icons": [
+    {
+      "src": "https://images.seeklogo.com/logo-png/16/2/uniqlo-logo-png_seeklogo-168431.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
