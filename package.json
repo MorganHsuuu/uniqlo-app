@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:sheets": "bash scripts/test-google-sheet.sh"
   },
   "dependencies": {
     "lucide-react": "^1.17.0",

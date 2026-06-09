@@ -150,9 +150,9 @@ export default function SearchScreen({ onBack, onSearch, onOpenHelp }) {
           </div>
         )}
         {recent.map((item) => (
-          <div key={item} className="recent-item">
+          <div key={item} className="recent-item" onClick={() => submitSearch(item)}>
             <span>{item}</span>
-            <span className="remove" onClick={() => removeRecent(item)}>✕</span>
+            <span className="remove" onClick={(e) => { e.stopPropagation(); removeRecent(item); }}>✕</span>
           </div>
         ))}
       </div>

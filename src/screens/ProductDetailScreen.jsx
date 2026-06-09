@@ -20,7 +20,7 @@ export default function ProductDetailScreen({ product, onBack, onAddToCart }) {
       selectedSize,
     });
     setAdded(true);
-    setTimeout(() => { onBack(); }, 800);
+    setTimeout(() => { onBack(); }, 1100);
   };
 
   return (

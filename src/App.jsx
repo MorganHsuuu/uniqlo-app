@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Search, ShoppingCart, Bot, Home, Heart, Bell, User, Menu } from "lucide-react";
 import HomeScreen from "./screens/HomeScreen";
 import CategoryScreen from "./screens/CategoryScreen";
@@ -8,6 +8,9 @@ import ProductDetailScreen from "./screens/ProductDetailScreen";
 import CartScreen from "./screens/CartScreen";
 import HelpScreen from "./screens/HelpScreen";
 import AccountScreen from "./screens/AccountScreen";
+import ResearchOverlay from "./research/ResearchOverlay.jsx";
+import { useResearchOptional } from "./research/ResearchContext.jsx";
+import "./research/research.css";
 import "./App.css";
 
 const TAB_ICONS = {
@@ -32,6 +35,9 @@ const persist = (key, val) => { try { sessionStorage.setItem(key, val); } catch 
 const restore = (key, fallback) => { try { return sessionStorage.getItem(key) || fallback; } catch { return fallback; } };
 
 export default function App() {
+  const research = useResearchOptional();
+  const report = research?.reportEvent;
+
   const [activeTab, setActiveTab] = useState(() => restore("uq_tab", "home"));
   const [activeNav, setActiveNav] = useState(() => {
     const tab = restore("uq_tab", "home");
@@ -46,6 +52,7 @@ export default function App() {
   // overlay: null | { type: 'product'|'cart'|'help'|'categoryList', data?: any }
 
   const handleSearch = (q) => {
+    report?.("search", { query: q });
     setSearchQuery(q);
     setShowSearch(false);
   };
@@ -62,19 +69,46 @@ export default function App() {
   const switchTab = (id) => { persist("uq_tab", id); setActiveTab(id); };
   const switchNav = (nav) => { persist("uq_nav", nav || ""); setActiveNav(nav); };
 
-  const openProduct = (product) => setOverlay({ type: "product", data: product });
+  const openProduct = (product, meta = {}) => {
+    report?.("product_open", {
+      product,
+      searchQuery: meta.searchQuery ?? searchQuery ?? undefined,
+    });
+    setOverlay({ type: "product", data: product });
+  };
   const openCart = () => setOverlay({ type: "cart" });
-  const openHelp = () => setOverlay({ type: "help" });
-  const openCategoryList = (categoryName, navOverride) => setOverlay({ type: "categoryList", data: { categoryName, nav: navOverride || activeNav || "WOMEN" } });
+  const openHelp = () => {
+    report?.("help_open", {});
+    setOverlay({ type: "help" });
+  };
+  const openCategoryList = (categoryName, navOverride) => {
+    const nav = navOverride || activeNav || "WOMEN";
+    report?.("category_open", { category: categoryName, nav });
+    setOverlay({ type: "categoryList", data: { categoryName, nav } });
+  };
   const closeOverlay = () => setOverlay(null);
 
   const addToCart = (item) => {
+    report?.("cart_add", { color: item.selectedColor, item });
     setCart((prev) => [...prev, item]);
   };
 
   const removeFromCart = (idx) => {
+    report?.("cart_remove", {});
     setCart((prev) => prev.filter((_, i) => i !== idx));
   };
+
+  const resetToHome = useCallback(() => {
+    switchTab("home");
+    switchNav(null);
+    setOverlay(null);
+    setShowSearch(false);
+    setSearchQuery(null);
+  }, []);
+
+  useEffect(() => {
+    research?.registerResetToHome?.(resetToHome);
+  }, [research, resetToHome]);
 
   const showOverlay = overlay !== null;
   const showMainChrome = !showOverlay && !showSearch && !searchQuery;
@@ -138,7 +172,6 @@ export default function App() {
     if (activeTab === "menu") {
       return (
         <CategoryScreen
-          key={activeNav || "MEN"}
           activeNav={activeNav || "MEN"}
           onCategoryClick={openCategoryList}
         />
@@ -199,6 +232,7 @@ export default function App() {
                 key={tab}
                 className={`nav-item ${activeTab !== "home" && activeNav === tab ? "active" : ""}`}
                 onClick={() => {
+                  if (activeNav === tab && activeTab === "menu") return;
                   switchNav(tab);
                   switchTab("menu");
                 }}
@@ -206,6 +240,15 @@ export default function App() {
                 {{ WOMEN: "女裝", MEN: "男裝", KIDS: "童裝", BABY: "嬰兒" }[tab]}
               </button>
             ))}
+            {activeTab !== "home" && activeNav && (
+              <span
+                className="nav-indicator"
+                style={{
+                  width: `${100 / NAV_TABS.length}%`,
+                  transform: `translateX(${NAV_TABS.indexOf(activeNav) * 100}%)`,
+                }}
+              />
+            )}
           </nav>
         )}
 
@@ -239,6 +282,7 @@ export default function App() {
             })}
           </nav>
         )}
+        <ResearchOverlay />
       </div>
     </div>
   );

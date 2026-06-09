@@ -1,7 +1,5 @@
 node_modules
 dist
 .DS_Store
-*.local
-.claude
-IMG_*.PNG
-IMG_*.jpg
+.env
+.env.local

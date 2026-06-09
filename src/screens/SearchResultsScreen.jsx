@@ -1,5 +1,6 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { Heart, Search } from "lucide-react";
+import { useResearchOptional } from "../research/ResearchContext.jsx";
 
 const FILTER_CHIPS = ["尺寸", "顏色", "價格"];
 
@@ -316,6 +317,14 @@ const PRODUCTS = [
   },
 ];
 
+function isWomenTshirtContext(query, navContext) {
+  if (navContext === "MEN") return false;
+  if (!query) return false;
+  const s = query.replace(/\s/g, "").toLowerCase();
+  return s.includes("t恤") || s.includes("tshirt") || s === "t"
+    || (s.includes("女性") && (s.includes("t") || s.includes("t恤")));
+}
+
 export default function SearchResultsScreen({ query, navContext, onBack, onProductClick }) {
   const [sortOpen, setSortOpen] = useState(false);
   const [sortBy, setSortBy] = useState("default");
@@ -371,8 +380,24 @@ export default function SearchResultsScreen({ query, navContext, onBack, onProdu
 
   const isKidsOuter = query === "外套類" && navContext === "KIDS";
   const isMenTshirt = query === "T恤" && navContext === "MEN";
-  const isWomenTshirt = (query === "T恤" || query === "T") && navContext !== "MEN";
+  const isWomenTshirt = isWomenTshirtContext(query, navContext);
+  const research = useResearchOptional();
   const sizeOptions = isKidsOuter ? KIDS_SIZES : ALL_SIZES;
+
+  useEffect(() => {
+    if (isWomenTshirt) {
+      research?.reportEvent("women_tshirt_view", {});
+    }
+  }, [isWomenTshirt, research]);
+
+  useEffect(() => {
+    if (!isWomenTshirt) return;
+    research?.reportEvent("filter_update", {
+      context: "women_tshirt",
+      size: selectedSize,
+      sort: sortBy,
+    });
+  }, [isWomenTshirt, selectedSize, sortBy, research]);
 
   const filteredAndSorted = useMemo(() => {
     let list = isKidsOuter   ? [...KIDS_OUTER_PRODUCTS]
@@ -560,7 +585,10 @@ export default function SearchResultsScreen({ query, navContext, onBack, onProdu
           <div
             key={p.id}
             className="product-card"
-            onClick={() => onProductClick && onProductClick(p)}
+            onClick={() => {
+              research?.reportEvent?.("product_open", { product: p, searchQuery: query });
+              onProductClick?.(p, { searchQuery: query });
+            }}
           >
             <div className="product-img-wrap">
               {p.img ? (

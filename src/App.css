@@ -19,6 +19,32 @@
 button { background: none; border: none; cursor: pointer; font-family: inherit; }
 body { font-family: var(--font-main); background: white; }
 
+/* ── Soft tap feedback ── */
+.nav-item,
+.tab-item,
+.cat-item,
+.icon-btn,
+.badge,
+.result-chip,
+.filter-bar-btn,
+.detail-size-btn,
+.detail-cart-btn {
+  transition: background-color 0.28s ease, color 0.28s ease, border-color 0.28s ease,
+    opacity 0.28s ease, transform 0.22s ease;
+}
+.nav-item:active,
+.tab-item:active,
+.cat-item:active,
+.icon-btn:active,
+.badge:active,
+.result-chip:active,
+.filter-bar-btn:active,
+.detail-size-btn:active,
+.detail-cart-btn:active:not(.disabled) {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
 /* ── App Layout ── */
 .app-root {
   position: fixed;
@@ -27,6 +53,7 @@ body { font-family: var(--font-main); background: white; }
 }
 
 .phone-frame {
+  position: relative;
   width: 100%;
   height: 100%;
   background: var(--uq-white);
@@ -85,6 +112,7 @@ body { font-family: var(--font-main); background: white; }
 
 /* ── Nav Tabs ── */
 .uq-nav {
+  position: relative;
   display: flex;
   border-bottom: var(--uq-border);
   background: var(--uq-white);
@@ -94,18 +122,34 @@ body { font-family: var(--font-main); background: white; }
 .nav-item {
   flex: 1;
   text-align: center;
-  padding: 10px 0 8px;
+  padding: 11px 0 9px;
   font-size: 12px;
   font-weight: 500;
   color: var(--uq-gray-600);
   letter-spacing: 0.5px;
   border-bottom: 2px solid transparent;
-  transition: all 0.15s;
+  transition: color 0.52s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.52s ease;
 }
 .nav-item.active {
   color: var(--uq-black);
-  font-weight: 700;
-  border-bottom: 2px solid var(--uq-black);
+  font-weight: 600;
+  border-bottom-color: transparent;
+}
+.nav-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--uq-black);
+  pointer-events: none;
+  transition: transform 0.58s cubic-bezier(0.34, 1.15, 0.64, 1);
+  will-change: transform;
+}
+.nav-item:active {
+  transform: none;
+  opacity: 0.72;
+  transition-duration: 0.1s;
 }
 .uq-nav.home-idle .nav-item {
   color: var(--uq-gray-400);
@@ -113,11 +157,27 @@ body { font-family: var(--font-main); background: white; }
   opacity: 0.55;
 }
 
+@keyframes category-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-nav-content {
+  animation: category-content-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* ── Main Content ── */
 .screen-content {
   flex: 1;
   overflow-y: auto;
   background: var(--uq-white);
+  scroll-behavior: smooth;
 }
 .screen-content::-webkit-scrollbar { display: none; }
 

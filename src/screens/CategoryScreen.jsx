@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const CATEGORIES = [
   { name: "外套類", bg: "#e8e0d4", color: "#c5b8a0", img: "https://www.uniqlo.com/tw/cms/50a91f4082eb58dd9be487d7becaa859.jpg" },
@@ -62,8 +62,15 @@ const FILTER_OPTIONS = {
   尺寸: ["XS", "S", "M", "L", "XL", "XXL"],
 };
 
-export default function CategoryScreen({ activeNav: initialNav, onCategoryClick }) {
-  const [activeNav, setActiveNav] = useState(initialNav || "MEN");
+export default function CategoryScreen({ activeNav = "MEN", onCategoryClick }) {
+  const prevNavRef = useRef(activeNav);
+
+  useEffect(() => {
+    if (prevNavRef.current !== activeNav) {
+      prevNavRef.current = activeNav;
+      document.querySelector(".screen-content")?.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [activeNav]);
   const [activeBadge, setActiveBadge] = useState(null);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [sortBy, setSortBy] = useState("default");
@@ -112,6 +119,7 @@ export default function CategoryScreen({ activeNav: initialNav, onCategoryClick 
         </div>
       )}
 
+      <div key={activeNav} className="category-nav-content">
 
       {/* Tab Banner */}
       {(() => {
@@ -206,6 +214,8 @@ export default function CategoryScreen({ activeNav: initialNav, onCategoryClick 
             {b}
           </div>
         ))}
+      </div>
+
       </div>
 
       {/* Filter Bottom Sheet */}

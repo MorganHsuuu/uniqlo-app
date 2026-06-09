@@ -1,6 +1,13 @@
 import { Bot } from "lucide-react";
+import { useResearchOptional } from "../research/ResearchContext.jsx";
 
 export default function AccountScreen({ onOpenHelp }) {
+  const research = useResearchOptional();
+
+  const openHelpEntry = (source) => {
+    research?.reportEvent?.("help_open", { source });
+    onOpenHelp?.();
+  };
   const MEMBER_NO = "7107077042025";
 
   const ACCOUNT_ITEMS = [
@@ -28,7 +35,7 @@ export default function AccountScreen({ onOpenHelp }) {
     "關於 UNIQLO",
   ];
 
-  const Section = ({ title, items }) => (
+  const Section = ({ title, items, onItemClick }) => (
     <div style={{ marginBottom: 0 }}>
       <div style={{
         background: "#f5f5f5", padding: "10px 16px",
@@ -39,7 +46,7 @@ export default function AccountScreen({ onOpenHelp }) {
       </div>
       {items.map((item, i) => (
         <div key={i}
-          onClick={() => item === "客服中心" && onOpenHelp?.()}
+          onClick={() => onItemClick?.(item)}
           style={{
             display: "flex", justifyContent: "space-between", alignItems: "center",
             padding: "16px 16px", borderBottom: "0.5px solid #efefef",
@@ -61,7 +68,7 @@ export default function AccountScreen({ onOpenHelp }) {
         padding: "10px 16px", background: "white", borderBottom: "0.5px solid #e0e0e0",
       }}>
         <button
-          onClick={onOpenHelp}
+          onClick={() => openHelpEntry("account_smart_cs")}
           style={{
             display: "flex", alignItems: "center", gap: 6,
             fontSize: 13, fontWeight: 600, color: "#111",
@@ -106,7 +113,13 @@ export default function AccountScreen({ onOpenHelp }) {
       <Section title="我的帳戶" items={ACCOUNT_ITEMS} />
       <Section title="訂單中心" items={ORDER_ITEMS} />
       <Section title="點數與優惠" items={POINT_ITEMS} />
-      <Section title="說明與設定" items={HELP_ITEMS} />
+      <Section
+        title="說明與設定"
+        items={HELP_ITEMS}
+        onItemClick={(item) => {
+          if (item === "客服中心") openHelpEntry("account_help_center");
+        }}
+      />
 
       <div style={{ height: 32 }} />
     </div>
