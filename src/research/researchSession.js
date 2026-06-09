@@ -39,6 +39,7 @@ export function saveResearchProgress(state) {
       phase: state.taskRunning ? "task" : state.phase,
       currentTaskIndex: state.currentTaskIndex,
       taskTimings: state.taskTimings,
+      profileAnswers: state.profileAnswers,
       susAnswers: state.susAnswers,
       feedback: state.feedback,
       email: state.email,

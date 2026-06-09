@@ -11,7 +11,9 @@
  */
 
 const HEADERS = [
-  "sessionId", "submittedAt", "email", "feedback", "susScore",
+  "sessionId", "submittedAt",
+  "profileQ1", "profileQ2", "profileQ3", "profileQ4",
+  "email", "feedback", "susScore",
   "susQ1", "susQ2", "susQ3", "susQ4", "susQ5",
   "susQ6", "susQ7", "susQ8", "susQ9", "susQ10",
   "task1Sec", "task2Sec", "task3Sec", "task4Sec", "task5Sec",
@@ -41,6 +43,7 @@ function doPost(e) {
     sheet.appendRow([
       data.sessionId || "",
       data.submittedAt || "",
+      data.profileQ1 ?? "", data.profileQ2 ?? "", data.profileQ3 ?? "", data.profileQ4 ?? "",
       data.email || "",
       data.feedback || "",
       data.susScore ?? "",

@@ -106,9 +106,18 @@ export default function App() {
     setSearchQuery(null);
   }, []);
 
+  const resetToMenu = useCallback(() => {
+    switchTab("menu");
+    switchNav("MEN");
+    setOverlay(null);
+    setShowSearch(false);
+    setSearchQuery(null);
+  }, []);
+
   useEffect(() => {
     research?.registerResetToHome?.(resetToHome);
-  }, [research, resetToHome]);
+    research?.registerResetToMenu?.(resetToMenu);
+  }, [research, resetToHome, resetToMenu]);
 
   const showOverlay = overlay !== null;
   const showMainChrome = !showOverlay && !showSearch && !searchQuery;

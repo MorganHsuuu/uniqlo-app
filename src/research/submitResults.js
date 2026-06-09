@@ -6,6 +6,10 @@ function buildPayload(session) {
   return {
     sessionId: session.sessionId,
     submittedAt: new Date().toISOString(),
+    profileQ1: session.profileAnswers?.gender ?? "",
+    profileQ2: session.profileAnswers?.age ?? "",
+    profileQ3: session.profileAnswers?.appUsedBefore ?? "",
+    profileQ4: session.profileAnswers?.onlineShopFreq ?? "",
     email: session.email || "",
     feedback: session.feedback || "",
     susScore: calculateSusScore(susAnswers),

@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { RESEARCH_ENABLED } from "./config.js";
 import { isWhiteColor } from "./isWhiteColor.js";
 import { clearResearchProgress, loadResearchProgress, saveResearchProgress } from "./researchSession.js";
-import { TASKS } from "./taskDefinitions.js";
+import { TASKS, EMPTY_PROFILE } from "./taskDefinitions.js";
 import { submitResults } from "./submitResults.js";
 
 const ResearchContext = createContext(null);
@@ -20,6 +20,7 @@ function initialState() {
       phase: saved.phase || "intro",
       currentTaskIndex: saved.currentTaskIndex ?? 0,
       taskTimings: saved.taskTimings || {},
+      profileAnswers: saved.profileAnswers || { ...EMPTY_PROFILE },
       susAnswers: saved.susAnswers || Array(10).fill(null),
       feedback: saved.feedback || "",
       email: saved.email || "",
@@ -32,6 +33,7 @@ function initialState() {
     phase: "intro",
     currentTaskIndex: 0,
     taskTimings: {},
+    profileAnswers: { ...EMPTY_PROFILE },
     susAnswers: Array(10).fill(null),
     feedback: "",
     email: "",
@@ -60,6 +62,7 @@ export function ResearchProvider({ children }) {
   const [taskRunning, setTaskRunning] = useState(false);
   const [celebratingTask, setCelebratingTask] = useState(null);
   const [taskTimings, setTaskTimings] = useState(init.taskTimings);
+  const [profileAnswers, setProfileAnswers] = useState(init.profileAnswers);
   const [susAnswers, setSusAnswers] = useState(init.susAnswers);
   const [feedback, setFeedback] = useState(init.feedback);
   const [email, setEmail] = useState(init.email);
@@ -71,6 +74,7 @@ export function ResearchProvider({ children }) {
   const sessionId = useRef(init.sessionId);
   const taskStartRef = useRef(null);
   const resetToHomeRef = useRef(null);
+  const resetToMenuRef = useRef(null);
   const taskStateRef = useRef({
     task2Search: false,
     task3SizeM: false,
@@ -89,11 +93,12 @@ export function ResearchProvider({ children }) {
       currentTaskIndex,
       taskRunning,
       taskTimings,
+      profileAnswers,
       susAnswers,
       feedback,
       email,
     });
-  }, [showResearch, phase, currentTaskIndex, taskRunning, taskTimings, susAnswers, feedback, email]);
+  }, [showResearch, phase, currentTaskIndex, taskRunning, taskTimings, profileAnswers, susAnswers, feedback, email]);
 
   useEffect(() => {
     persist();
@@ -124,6 +129,10 @@ export function ResearchProvider({ children }) {
 
   const registerResetToHome = useCallback((fn) => {
     resetToHomeRef.current = fn;
+  }, []);
+
+  const registerResetToMenu = useCallback((fn) => {
+    resetToMenuRef.current = fn;
   }, []);
 
   const advanceAfterCelebrate = useCallback((finishedIndex) => {
@@ -230,12 +239,19 @@ export function ResearchProvider({ children }) {
   }, [showResearch, taskRunning, currentTask, finishTask]);
 
   const completeIntro = useCallback(() => {
+    setPhase("profile");
+    setResumed(false);
+  }, []);
+
+  const submitProfile = useCallback((answers) => {
+    setProfileAnswers(answers);
     setPhase("task");
     setResumed(false);
   }, []);
 
   const dismissStudy = useCallback(() => {
     clearResearchProgress();
+    resetToMenuRef.current?.();
     setDismissed(true);
   }, []);
 
@@ -252,6 +268,7 @@ export function ResearchProvider({ children }) {
       await submitResults({
         sessionId: sessionId.current,
         taskTimings,
+        profileAnswers,
         susAnswers,
         feedback,
         email,
@@ -266,7 +283,7 @@ export function ResearchProvider({ children }) {
     } finally {
       setSubmitting(false);
     }
-  }, [taskTimings, susAnswers, feedback, email]);
+  }, [taskTimings, profileAnswers, susAnswers, feedback, email]);
 
   const value = useMemo(() => ({
     researchActive: showResearch,
@@ -276,6 +293,7 @@ export function ResearchProvider({ children }) {
     taskRunning,
     celebratingTask,
     taskTimings,
+    profileAnswers,
     totalTasks: TASKS.length,
     susAnswers,
     feedback,
@@ -288,15 +306,17 @@ export function ResearchProvider({ children }) {
     setEmail,
     startCurrentTask,
     completeIntro,
+    submitProfile,
     submitSus,
     submitFeedback,
     reportEvent,
     registerResetToHome,
+    registerResetToMenu,
     dismissStudy,
   }), [
     showResearch, phase, currentTask, currentTaskIndex, taskRunning, celebratingTask, taskTimings,
-    susAnswers, feedback, email, submitting, submitError, resumed, timerReset,
-    startCurrentTask, completeIntro, submitSus, submitFeedback, reportEvent, registerResetToHome, dismissStudy,
+    profileAnswers, susAnswers, feedback, email, submitting, submitError, resumed, timerReset,
+    startCurrentTask, completeIntro, submitProfile, submitSus, submitFeedback, reportEvent, registerResetToHome, registerResetToMenu, dismissStudy,
   ]);
 
   return (

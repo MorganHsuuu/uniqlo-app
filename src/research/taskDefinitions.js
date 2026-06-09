@@ -26,6 +26,36 @@ export const TASKS = [
   },
 ];
 
+export const EMPTY_PROFILE = {
+  gender: null,
+  age: null,
+  appUsedBefore: null,
+  onlineShopFreq: null,
+};
+
+export const PROFILE_QUESTIONS = [
+  {
+    id: "gender",
+    label: "Q1 生理性別",
+    options: ["男", "女", "其他", "不願透露"],
+  },
+  {
+    id: "age",
+    label: "Q2 年齡",
+    options: ["18 歲以下", "18–24 歲", "25–34 歲", "35–44 歲", "45–54 歲", "55 歲以上"],
+  },
+  {
+    id: "appUsedBefore",
+    label: "Q3 你是否使用過 UNIQLO App？",
+    options: ["是", "否"],
+  },
+  {
+    id: "onlineShopFreq",
+    label: "Q4 您多久線上購物一次？",
+    options: ["每週", "每月", "每季", "很少", "幾乎不"],
+  },
+];
+
 export const SUS_QUESTIONS = [
   "我覺得會經常使用這個 App",
   "我覺得這個 App 沒有必要這麼複雜",

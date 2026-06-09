@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { SUS_QUESTIONS } from "./taskDefinitions.js";
 import { useResearch } from "./ResearchContext.jsx";
 import TaskInstruction from "./TaskInstruction.jsx";
+import ProfileForm from "./ProfileForm.jsx";
 import { TASK_HINTS } from "./taskHints.js";
 
 const STUCK_MS = 20000;
@@ -31,23 +32,28 @@ export default function ResearchOverlay() {
     setEmail,
     startCurrentTask,
     completeIntro,
+    submitProfile,
     submitSus,
     submitFeedback,
     dismissStudy,
     resumed,
     timerReset,
     susAnswers,
+    profileAnswers,
   } = useResearch();
 
   const [showStuckHint, setShowStuckHint] = useState(false);
   const [hintOpen, setHintOpen] = useState(false);
+  const [taskHintExpanded, setTaskHintExpanded] = useState(false);
 
   useEffect(() => {
     if (phase !== "running" || !taskRunning) {
       setShowStuckHint(false);
       setHintOpen(false);
+      setTaskHintExpanded(false);
       return;
     }
+    setTaskHintExpanded(false);
     const t = window.setTimeout(() => setShowStuckHint(true), STUCK_MS);
     return () => window.clearTimeout(t);
   }, [phase, taskRunning, currentTaskIndex]);
@@ -58,15 +64,24 @@ export default function ResearchOverlay() {
     <>
       {phase === "running" && taskRunning && currentTask && (
         <>
-          <div className="research-task-hint" aria-live="polite">
+          <button
+            type="button"
+            className={`research-task-hint ${taskHintExpanded ? "research-task-hint--expanded" : ""}`}
+            aria-live="polite"
+            aria-expanded={taskHintExpanded}
+            onClick={() => setTaskHintExpanded((v) => !v)}
+          >
             <div className="research-task-hint-header">
               <span className="research-task-hint-badge">任務 {currentTaskIndex + 1}/{totalTasks}</span>
               <span className="research-task-hint-title">{currentTask.title}</span>
+              {!taskHintExpanded && (
+                <span className="research-task-hint-tap">點擊查看</span>
+              )}
             </div>
             <div className="research-task-hint-text">
               <TaskInstruction taskId={currentTask.id} />
             </div>
-          </div>
+          </button>
 
           {showStuckHint && (
             <button
@@ -100,10 +115,17 @@ export default function ResearchOverlay() {
         </div>
       )}
 
-      {["intro", "task", "sus", "feedback", "done"].includes(phase) && (
+      {["intro", "profile", "task", "sus", "feedback", "done"].includes(phase) && (
         <div className="research-overlay">
           <div className="research-card">
             {phase === "intro" && <Intro onStart={completeIntro} resumed={resumed} />}
+            {phase === "profile" && (
+              <ProfileForm
+                onSubmit={submitProfile}
+                resumed={resumed}
+                initialProfile={profileAnswers}
+              />
+            )}
             {phase === "task" && currentTask && (
               <TaskPrompt
                 task={currentTask}
@@ -144,8 +166,8 @@ function Intro({ onStart, resumed }) {
       )}
       <h1 className="research-title">歡迎參與 UNIQLO App 介面測試</h1>
       <p className="research-body">
-        我們正在進行 App 介面的易用性研究。請依照指示完成 5 個操作任務，
-        全部完成後填寫簡短問卷。整個過程約需 5–10 分鐘。
+        您好，我是研究生<strong>徐摩根</strong>，目前正在進行 App 介面的易用性測試實驗。
+        請依照指示完成 5 個操作任務，再填寫簡短問卷，整個過程約 <strong>5 分鐘</strong>。
       </p>
       <ul className="research-list">
         <li>請依自己的真實感受操作，沒有對錯答案</li>
@@ -153,11 +175,10 @@ function Intro({ onStart, resumed }) {
         <li>操作時畫面下方會顯示任務說明，方便隨時查看</li>
       </ul>
       <div className="research-raffle-callout">
-        <div className="research-raffle-label">完成問卷抽獎</div>
+        <div className="research-raffle-label">☕ 抽星巴克禮券</div>
         <p className="research-raffle-text">
-          完成全部任務並<strong>填寫 Email</strong>，即可參加
-          <strong> 星巴克禮券 </strong>
-          抽獎！
+          約 <strong>5 分鐘</strong>完成測驗，填上 Email，
+          就有機會帶走<strong>星巴克禮券</strong>！
         </p>
       </div>
       <p className="research-note">
