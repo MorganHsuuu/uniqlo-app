@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { RESEARCH_ENABLED } from "./config.js";
+import { isWomenTshirtProduct } from "./isWomenTshirt.js";
 import { isWhiteColor } from "./isWhiteColor.js";
 import { clearResearchProgress, loadResearchProgress, saveResearchProgress } from "./researchSession.js";
 import { TASKS, EMPTY_PROFILE } from "./taskDefinitions.js";
@@ -225,7 +226,12 @@ export function ResearchProvider({ children }) {
     }
 
     if (currentTask.id === "task4") {
-      if (event === "cart_add" && payload.color && isWhiteColor(payload.color)) {
+      if (
+        event === "cart_add" &&
+        payload.color &&
+        isWhiteColor(payload.color) &&
+        isWomenTshirtProduct(payload.item)
+      ) {
         s.task4AddedBright = true;
       }
       if (event === "cart_remove" && s.task4AddedBright) {

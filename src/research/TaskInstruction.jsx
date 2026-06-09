@@ -25,7 +25,7 @@ export default function TaskInstruction({ taskId, className }) {
     case "task4":
       return (
         <Tag className={cls}>
-          從篩選結果中選一件任一<strong>白色</strong>商品加入購物車，並到購物車中移除該商品。
+          從篩選結果中選一件<strong>白色女性 T 恤</strong>加入購物車，並到購物車中移除該商品。
         </Tag>
       );
     case "task5":
