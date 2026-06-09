@@ -107,6 +107,11 @@ body { font-family: var(--font-main); background: white; }
   font-weight: 700;
   border-bottom: 2px solid var(--uq-black);
 }
+.uq-nav.home-idle .nav-item {
+  color: var(--uq-gray-400);
+  font-weight: 400;
+  opacity: 0.55;
+}
 
 /* ── Main Content ── */
 .screen-content {

@@ -33,7 +33,12 @@ const restore = (key, fallback) => { try { return sessionStorage.getItem(key) ||
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(() => restore("uq_tab", "home"));
-  const [activeNav, setActiveNav] = useState(() => restore("uq_nav", "WOMEN"));
+  const [activeNav, setActiveNav] = useState(() => {
+    const tab = restore("uq_tab", "home");
+    if (tab === "home") return null;
+    const nav = restore("uq_nav", "MEN");
+    return nav || null;
+  });
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState(null);
   const [cart, setCart] = useState([]);
@@ -55,12 +60,12 @@ export default function App() {
   };
 
   const switchTab = (id) => { persist("uq_tab", id); setActiveTab(id); };
-  const switchNav = (nav) => { persist("uq_nav", nav); setActiveNav(nav); };
+  const switchNav = (nav) => { persist("uq_nav", nav || ""); setActiveNav(nav); };
 
   const openProduct = (product) => setOverlay({ type: "product", data: product });
   const openCart = () => setOverlay({ type: "cart" });
   const openHelp = () => setOverlay({ type: "help" });
-  const openCategoryList = (categoryName, navOverride) => setOverlay({ type: "categoryList", data: { categoryName, nav: navOverride || activeNav } });
+  const openCategoryList = (categoryName, navOverride) => setOverlay({ type: "categoryList", data: { categoryName, nav: navOverride || activeNav || "WOMEN" } });
   const closeOverlay = () => setOverlay(null);
 
   const addToCart = (item) => {
@@ -130,26 +135,16 @@ export default function App() {
     if (activeTab === "account") {
       return <AccountScreen onOpenHelp={openHelp} />;
     }
-    if (activeTab === "menu" || activeNav === "MEN") {
+    if (activeTab === "menu") {
       return (
         <CategoryScreen
-          key={activeNav}
-          activeNav={activeNav}
+          key={activeNav || "MEN"}
+          activeNav={activeNav || "MEN"}
           onCategoryClick={openCategoryList}
         />
       );
     }
-    return (
-      <HomeScreen
-        activeNav={activeNav}
-        navTabs={NAV_TABS}
-        onCategoryClick={openCategoryList}
-        onNavClick={(tab) => {
-          switchNav(tab);
-          switchTab("menu");
-        }}
-      />
-    );
+    return <HomeScreen />;
   };
 
   return (
@@ -171,7 +166,7 @@ export default function App() {
             <div
               className="uq-logo"
               style={{ cursor: "pointer" }}
-              onClick={() => { switchTab("home"); switchNav("WOMEN"); setOverlay(null); setShowSearch(false); setSearchQuery(null); }}
+              onClick={() => { switchTab("home"); switchNav(null); setOverlay(null); setShowSearch(false); setSearchQuery(null); }}
             >
               <img
                 src="https://images.seeklogo.com/logo-png/16/2/uniqlo-logo-png_seeklogo-168431.png"
@@ -198,11 +193,11 @@ export default function App() {
 
         {/* Nav Tabs — outside scroll area, always visible */}
         {showMainChrome && activeTab !== "account" && (
-          <nav className="uq-nav">
+          <nav className={`uq-nav ${activeTab === "home" ? "home-idle" : ""}`}>
             {NAV_TABS.map((tab) => (
               <button
                 key={tab}
-                className={`nav-item ${activeNav === tab ? "active" : ""}`}
+                className={`nav-item ${activeTab !== "home" && activeNav === tab ? "active" : ""}`}
                 onClick={() => {
                   switchNav(tab);
                   switchTab("menu");
@@ -233,7 +228,8 @@ export default function App() {
                     switchTab(tab.id);
                     setShowSearch(false);
                     setSearchQuery(null);
-                    if (tab.id === "home") switchNav("WOMEN");
+                    if (tab.id === "home") switchNav(null);
+                    if (tab.id === "menu" && !activeNav) switchNav("MEN");
                   }}
                 >
                   <Icon size={22} strokeWidth={isActive ? 2 : 1.5} />
