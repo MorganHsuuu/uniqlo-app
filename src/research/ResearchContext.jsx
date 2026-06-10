@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { RESEARCH_ENABLED } from "./config.js";
+import { RESEARCH_ENABLED, RESEARCH_CLOSED } from "./config.js";
 import { isWomenTshirtProduct } from "./isWomenTshirt.js";
 import { isWhiteColor } from "./isWhiteColor.js";
 import { clearResearchProgress, loadResearchProgress, saveResearchProgress } from "./researchSession.js";
@@ -14,6 +14,20 @@ function newSessionId() {
 }
 
 function initialState() {
+  if (RESEARCH_CLOSED) {
+    return {
+      sessionId: newSessionId(),
+      phase: "closed",
+      currentTaskIndex: 0,
+      taskTimings: {},
+      profileAnswers: { ...EMPTY_PROFILE },
+      susAnswers: Array(10).fill(null),
+      feedback: "",
+      email: "",
+      resumed: false,
+      timerReset: false,
+    };
+  }
   const saved = loadResearchProgress();
   if (saved) {
     return {
@@ -45,9 +59,17 @@ function initialState() {
 
 export function ResearchProvider({ children }) {
   const completedKey = "uq_research_completed";
+  const closedDismissKey = "uq_research_closed_dismissed";
   const [dismissed, setDismissed] = useState(false);
   const [researchActive] = useState(() => {
     if (!RESEARCH_ENABLED) return false;
+    if (RESEARCH_CLOSED) {
+      try {
+        return !localStorage.getItem(closedDismissKey);
+      } catch {
+        return true;
+      }
+    }
     try {
       return !localStorage.getItem(completedKey);
     } catch {
@@ -87,7 +109,7 @@ export function ResearchProvider({ children }) {
   const currentTask = TASKS[currentTaskIndex] || null;
 
   const persist = useCallback(() => {
-    if (!showResearch) return;
+    if (!showResearch || RESEARCH_CLOSED) return;
     saveResearchProgress({
       sessionId: sessionId.current,
       phase,
@@ -256,6 +278,14 @@ export function ResearchProvider({ children }) {
   }, []);
 
   const dismissStudy = useCallback(() => {
+    if (RESEARCH_CLOSED) {
+      try {
+        localStorage.setItem(closedDismissKey, "1");
+      } catch {}
+      resetToMenuRef.current?.();
+      setDismissed(true);
+      return;
+    }
     clearResearchProgress();
     resetToMenuRef.current?.();
     setDismissed(true);

@@ -317,6 +317,41 @@
   border-color: var(--uq-black);
 }
 
+.research-card--closed {
+  max-width: 360px;
+}
+
+.research-winner-img-wrap {
+  margin: 12px 0 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.research-winner-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.research-winner-callout {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(46, 170, 101, 0.1);
+  border: 1px solid rgba(46, 170, 101, 0.28);
+  text-align: center;
+}
+
+.research-winner-email {
+  margin: 6px 0 4px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--uq-black);
+  word-break: break-all;
+}
+
 .research-done-icon {
   width: 48px;
   height: 48px;

@@ -4,6 +4,7 @@ import { useResearch } from "./ResearchContext.jsx";
 import TaskInstruction from "./TaskInstruction.jsx";
 import ProfileForm from "./ProfileForm.jsx";
 import { TASK_HINTS } from "./taskHints.js";
+import { WINNER_EMAIL } from "./config.js";
 
 const STUCK_MS = 20000;
 
@@ -115,6 +116,14 @@ export default function ResearchOverlay() {
         </div>
       )}
 
+      {phase === "closed" && (
+        <div className="research-overlay">
+          <div className="research-card research-card--closed">
+            <ClosedAnnouncement onDismiss={dismissStudy} />
+          </div>
+        </div>
+      )}
+
       {["intro", "profile", "task", "sus", "feedback", "done"].includes(phase) && (
         <div className="research-overlay">
           <div className="research-card">
@@ -153,6 +162,33 @@ export default function ResearchOverlay() {
           </div>
         </div>
       )}
+    </>
+  );
+}
+
+function ClosedAnnouncement({ onDismiss }) {
+  return (
+    <>
+      <div className="research-badge">實驗已結束</div>
+      <h2 className="research-title">感謝您的參與！</h2>
+      <p className="research-body">
+        UNIQLO App 介面易用性測試已結束，感謝每一位協助的同學。
+      </p>
+      <div className="research-winner-img-wrap">
+        <img
+          src="/winner-announcement.png"
+          alt="星巴克得獎者抽獎結果"
+          className="research-winner-img"
+        />
+      </div>
+      <div className="research-winner-callout">
+        <div className="research-raffle-label">☕ 星巴克禮券得獎者</div>
+        <p className="research-winner-email">{WINNER_EMAIL}</p>
+        <p className="research-raffle-text">後續會跟您聯絡～</p>
+      </div>
+      <button type="button" className="research-primary" onClick={onDismiss}>
+        開始探索 App
+      </button>
     </>
   );
 }
